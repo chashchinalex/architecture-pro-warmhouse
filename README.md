@@ -197,7 +197,7 @@ Locations - название комнаты, sensorId - идентификато
 		}
 	}
 ```
-[Сделал микросервис temperature-api](/temperature-api) интергрировал в docker-compose.yml
+[Сделал микросервис temperature-api](/apps/temperature-api) интергрировал в docker-compose.yml
 
 2) Приложение следует упаковать в Docker и добавить в docker-compose. Порт по умолчанию должен быть 8081
 
