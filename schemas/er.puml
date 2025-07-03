@@ -1,0 +1,63 @@
+@startuml Умный дом - ER-диаграмма
+
+entity "users" {
+  * id : UUID <<PK>>
+  --
+  * username : VARCHAR(50)
+  * email : VARCHAR(100)
+  *  phone : VARCHAR(50)
+  password : VARCHAR(255)
+}
+
+entity "devices" {
+  * id : UUID <<PK>>
+  --
+  * name : VARCHAR(250)
+  * type : ENUM('Термостат', 'Ворота', 'Свет', 'Видеонаблюдение')
+  * location : location
+  * active : BOOLEAN
+}
+
+entity "locations" {
+  * id : UUID <<PK>>
+  --
+  * name : VARCHAR(250)
+  * gps_coordinates : VARCHAR(100)
+}
+
+entity "termostats" {
+  * id : UUID <<PK>>
+  --
+  * temp_current : DECIMAL(5,2)
+  * temp_target : DECIMAL(5,2)
+
+}
+
+entity "gates" {
+  * id : UUID <<PK>>
+  --
+  * DoorIsOpen : BOOLEAN
+}
+
+entity "lights" {
+  * id : UUID <<PK>>
+  --
+  * light_power : DECIMAL(5,2)
+  * lightIsOn : BOOLEAN
+}
+
+entity "cctvs" {
+  * id : UUID <<PK>>
+  --
+  * isOn : BOOLEAN
+}
+
+users ||--o{ devices : "управляет"
+locations ||--o{ devices : "содержит"
+devices ||--|| termostats : "является"
+devices ||--|| gates : "является"
+devices ||--|| lights : "является"
+devices ||--|| cctvs : "является"
+
+
+@enduml
