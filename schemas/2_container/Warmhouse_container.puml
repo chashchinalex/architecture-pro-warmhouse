@@ -1,0 +1,51 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/refs/heads/master/C4_Container.puml
+
+
+Person(user, "Клиент")
+
+System_Ext(mobileApp, "Мобильное приложение", "Интерфейс пользователя для управления домом")
+System_Ext(webAdmin, "Веб-панель администратора", "UI для технического и системного контроля")
+
+System_Ext(core_legacy, "Монолитная система Warmhouse")
+System_Ext(device, "Устройство")
+
+Container(proxy, "API Proxy", "Маршрутизация", "Обрабатывает входящие запросы, обеспечивает совместимость API v1 и v2")
+
+System_Boundary(docker_lk, "") {
+    Container(user_service, "Сервис Интерфейс пользователя", "Личный кабинет", "Управляет учетной записью пользователя")
+    Container(auth_service, "Сервис аутентификации", "Авторизация", "")
+}
+
+Container(devices_service, "Сервис устройств", "Устройства", "Регистрирует и управляет устройствами")
+Container(queue, "Очередь сообщений", "Kafka", "Асинхронный обмен сообщениями между сервисами")
+Container(telemetryService, "Сервис телеметрии", "Датчики", "Собирает и обрабатывает данные с устройств")
+
+ContainerDb(Db, "БД устройств", "PostgreSQL", "Информация об устройствах")
+
+Rel(user, mobileApp, "Отправляет запросы")
+Rel(user, webAdmin, "Отправляет запросы")
+Rel(mobileApp, proxy, "Отправляет запросы")
+Rel(webAdmin, proxy, "Отправляет запросы")
+Rel(proxy, auth_service, "Аутентификация / авторизация", "REST")
+Rel(proxy, user_service, "Управление ЛК", "REST")
+Rel(proxy, devices_service, "Управление устройствами", "REST")
+Rel(proxy, telemetryService, "Получение телеметрии", "REST")
+Rel(proxy, core_legacy, "Перенаправляет часть запросов", "REST")
+
+Rel(auth_service, Db, "Чтение/запись", "SQL")
+Rel(user_service, Db, "Чтение/запись", "SQL")
+Rel(devices_service, Db, "Чтение/запись", "SQL")
+Rel(telemetryService, Db, "Чтение/запись", "SQL")
+
+Rel(devices_service, device, "Регистрирует/удаляет устройство", "REST")
+
+Rel(telemetryService, device, "Получает данные", "Async API")
+
+Rel(queue, telemetryService, "Ответ с данными", "Async Msg")
+
+Rel(devices_service, auth_service, "Проверка прав", "REST")
+Rel(telemetryService, auth_service, "Проверка прав", "REST")
+Rel(user_service, auth_service, "Проверка прав", "REST")
+
+@enduml
