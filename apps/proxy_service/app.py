@@ -20,9 +20,8 @@ def proxy(version, subpath,):
     elif version == "v2":
         if subpath == "devices" or subpath == "devices/":
             target_base = os.getenv("ROUTE_V2_DEVICES")
-        elif subpath == "telemet" or subpath.startswith("telemet/"):
+        elif subpath == "telemetry" or subpath.startswith("telemet/"):
             target_base = os.getenv("ROUTE_V2_TELEMET")
-            subpath = subpath[len("telemet/"):]
         else:
             return Response(f"Unsupported v2 subpath: {subpath}", status=404)
     else:
