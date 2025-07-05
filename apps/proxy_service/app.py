@@ -16,7 +16,11 @@ for var in REQUIRED_ENV_VARS:
 @app.route('/api/<version>/<path:subpath>', methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
 def proxy(version, subpath,):
     if version == "v1":
-        target_base = os.getenv("ROUTE_V1")
+        if subpath == "sensors" or subpath == "sensors/":
+            target_base = os.getenv("ROUTE_V1_SENSORS")    
+            subpath= subpath.replace("sensors", "temperature", 1)  
+        else:
+            target_base = os.getenv("ROUTE_V1")
     elif version == "v2":
         if subpath == "devices" or subpath == "devices/":
             target_base = os.getenv("ROUTE_V2_DEVICES")

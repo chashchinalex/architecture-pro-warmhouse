@@ -1,0 +1,26 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(proxy, "API proxy", "Маршрутизация запросов между монолитом и микросервисами")
+Container(user_service, "Сервис идентификации пользователей", "Управляет личным кабинетом пользователя")
+Container_Boundary(device_manager_service , "Сервис учета устройств", "device_manager_service") {
+    Component(devices_controller_list, "devices_controller_list", "Работа со списком устройств")
+    Component(device_controller, "device_controller", "Работа с подключением устройств")
+    Component(service_layer, "service_layer", "Слой бизнес-логики")
+    Component(device_repository, "device_repository", "Слой работы с БД")
+}
+ContainerDb(db_devices, "База данных устройств", "БД со списком устройств")
+System_Ext(device, "Устройство")
+
+Rel(proxy, devices_controller_list, "Запросы", "REST API")
+Rel(proxy, device_controller, "Подтверждает подключение/запрашивает отключение", "REST API")
+Rel(device_controller, service_layer, "Вызывает методы")
+Rel(devices_controller_list, service_layer, "Вызывает методы")
+Rel(service_layer, device_repository, "Вызывает методы")
+Rel(service_layer, user_service, "Запросы на проверку прав", "REST API")
+Rel(device_repository, db_devices, "Запрашивает информацию об устройствах", "SQL")
+
+Rel(device, device_controller, "Запрос на подключение", "REST API")
+Rel(service_layer, device, "Запрос на отключение от системы", "REST API")
+
+@enduml

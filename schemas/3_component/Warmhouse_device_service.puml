@@ -1,0 +1,25 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+System_Ext(device, "Устройство", "Внешнее устройство, подключённое к системе")
+ContainerDb(db_devices, "Хранилище данных об устройствах", "Содержит информацию об устройствах")
+
+Container(user_service, "Сервис пользователей", "Отвечает за аутентификацию и функциональность личного кабинета")
+Container(telemetry_service, "Сервис телеметрии", "Осуществляет сбор и обработку телеметрических данных от устройств")
+
+Container_Boundary(device_control_service, "Сервис управления устройствами", "device_control_service") {
+    Component(device_controller_state, "Контроллер состояния", "Обрабатывает текущее состояние подключённых устройств")
+    Component(service_layer, "Бизнес-логика", "Реализует прикладные сценарии управления устройствами")
+    Component(device_repository, "Репозиторий", "Обеспечивает взаимодействие с хранилищем данных об устройствах")
+}
+
+Container(proxy, "API-прокси", "Распределяет входящие запросы между компонентами монолита и микросервисами")
+
+Rel(proxy, device_controller_state, "Передаёт запросы", "REST API")
+Rel(device_controller_state, service_layer, "Передаёт управление в бизнес-логику")
+Rel(service_layer, device_repository, "Осуществляет доступ к данным")
+Rel(device_repository, db_devices, "Извлекает информацию об устройствах", "SQL")
+Rel(service_layer, device, "Управляет состоянием подключённого устройства", "REST API")
+Rel(service_layer, user_service, "Проверяет права доступа", "REST API")
+Rel(service_layer, telemetry_service, "Получает телеметрию от устройств", "Асинхронное взаимодействие")
+@enduml

@@ -1,0 +1,26 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(proxy, "API Proxy", "Компонент маршрутизации", "Маршрутизирует запросы между монолитом и микросервисами")
+Container(device_management_service, "Сервис учёта устройств", "Микросервис", "Регистрация и подключение новых устройств")
+Container(device_control_service, "Сервис управления устройствами", "Микросервис", "Управляет состоянием устройств")
+Container(telemetry_service, "Сервис телеметрии", "Микросервис", "Сбор и обработка данных с устройств")
+ContainerDb(db_devices, "База данных устройств", "SQL", "Хранит данные об устройствах и правах доступа")
+
+Container_Boundary(user_service, "Сервис идентификации пользователей") {
+    Component(user_сontroller, "user_сontroller", "Контроллер", "Обрабатывает входящие пользовательские запросы")
+    Component(device_controller, "DeviceController", "Контроллер", "Проверка прав и переадресация к сервисам")
+    Component(service_layer, "Service Layer", "Бизнес-логика", "Реализация прикладных правил")
+    Component(device_repository, "Device Repository", "Репозиторий", "Работа с базой данных устройств")
+}
+
+Rel_R(proxy, user_сontroller, "HTTP-запросы", "REST API")
+Rel_D(device_controller, device_management_service, "Регистрация устройств", "REST API")
+Rel_D(device_controller, device_control_service, "Управление устройствами", "REST API")
+Rel_D(device_controller, telemetry_service, "Получение телеметрии", "REST API")
+Rel_D(user_сontroller, service_layer, "Вызов бизнес-методов")
+Rel_D(device_controller, service_layer, "Вызов бизнес-методов")
+Rel_D(service_layer, device_repository, "Запрос к данным")
+Rel_D(device_repository, db_devices, "SQL-запросы", "SQL")
+
+@enduml

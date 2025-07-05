@@ -1,0 +1,30 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+System_Ext(device, "Физическое устройство")
+
+Container(proxy, "API-прокси", "Осуществляет маршрутизацию запросов между монолитным приложением и микросервисами")
+
+Container(user_service, "Сервис аутентификации пользователей", "Управляет личным кабинетом и правами доступа")
+Container(device_control_service, "Сервис контроля устройств", "Обеспечивает управление состоянием устройств")
+
+Container_Boundary(telemetry_service, "Сервис обработки телеметрии", "telemetry_service") {
+    Component(telemetryController, "SensorDataController", "Обрабатывает входящие запросы на работу с датчиками")
+    Component(service_layer, "Слой бизнес-логики", "Реализует бизнес-процессы обработки телеметрии")
+    Component(device_repository, "Репозиторий устройств", "Обеспечивает доступ к данным об устройствах в базе данных")
+}
+
+ContainerDb(db_devices, "База данных устройств", "Хранит информацию о состоянии устройств")
+
+Rel(device, service_layer, "Отправляет данные с датчиков (по расписанию или по запросу)", "REST API")
+Rel(service_layer, device, "Запрашивает данные с устройства", "REST API")
+
+Rel(proxy, telemetryController, "Маршрутизирует внешние запросы", "REST API")
+Rel(telemetryController, service_layer, "Вызывает бизнес-логику")
+Rel(service_layer, device_repository, "Обращается к хранилищу данных")
+Rel(device_repository, db_devices, "Чтение/запись состояния устройств", "SQL")
+
+Rel(service_layer, user_service, "Проверка прав доступа пользователя", "REST API")
+Rel(device_control_service, service_layer, "Получает обновления от датчиков", "Async API")
+
+@enduml

@@ -1,0 +1,90 @@
+@startuml
+
+package "Warmhouse Device Management Service" {
+
+    class location_manager {
+        +listLocations(): List<Location>
+        +getLocationById(locationId: String): Location
+        +createLocation(location: Location): Location
+        +editLocation(location: Location): Location
+        +deleteLocation(locationId: String): void
+    }
+
+    class module_manager {
+        +listModules(locationId: String): List<Module>
+        +getModule(moduleId: String): Module
+        +createModule(module: Module): Module
+        +editModule(module: Module): Module
+        +deleteModule(moduleId: String): void
+        +attachDeviceToModule(deviceId: String, moduleId: String): Module
+    }
+
+    class device_manager {
+        +getDevicesByModule(moduleId: String): List<Device>
+        +getDeviceById(deviceId: String): Device
+        +registerDevice(device: Device): void
+        +authorizeDevice(deviceId: String): Device
+        +updateDeviceInfo(device: Device): Device
+        +disconnectDevice(deviceId: String): void
+    }
+
+    class location_service {
+        +fetchLocations(): List<Location>
+        +retrieveLocation(locationId: String): Location
+        +addLocation(location: Location): Location
+        +updateLocation(location: Location): Location
+        +removeLocation(locationId: String): void
+    }
+
+    class module_service {
+        +fetchModules(locationId: String): List<Module>
+        +retrieveModule(moduleId: String): Module
+        +addModule(module: Module): Module
+        +updateModule(module: Module): Module
+        +removeModule(moduleId: String): void
+        +linkDevice(deviceId: String, moduleId: String): Module
+    }
+
+    class device_service {
+        +getAllDevices(params: Map): List<Device>
+        +findDeviceById(deviceId: String): Device
+        +addDevice(device: Device): void
+        +modifyDevice(device: Device): void
+        +removeDevice(deviceId: String): void
+    }
+
+    class location_repository {
+        +findOne(locationId: String): Location
+        +save(location: Location): void
+        +update(location: Location): void
+        +delete(locationId: String): void
+    }
+
+    class module_repository {
+        +findOne(moduleId: String): Module
+        +save(module: Module): void
+        +update(module: Module): void
+        +delete(moduleId: String): void
+    }
+
+    class device_repository {
+        +findOne(deviceId: String): Device
+        +save(device: Device): void
+        +update(device: Device): void
+        +delete(deviceId: String): void
+    }
+
+    location_manager --> location_service
+    location_service --> location_repository
+
+    module_manager --> module_service
+    module_service --> module_repository
+    module_service --> device_repository
+    module_service --> location_repository
+
+    device_manager --> device_service
+    device_service --> device_repository
+    device_service --> module_repository
+}
+
+@enduml
